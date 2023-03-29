@@ -1,0 +1,41 @@
+name: Call E2E
+
+env:
+  E2E_LOG_PATH: test/runtime/e2edebugLog.txt
+  E2E_GINKGO_REPORT_PATH: test/runtime/ginkgoreport.json
+  PERFORMANCE_SCRIPT: test/scripts/getPerformanceData.sh
+  # ====modify====
+  PERFORMANCE_BADGE_ID:
+  PERFORMANCE_BADGE_FILENAME:
+
+permissions: write-all
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      ipfamily:
+        required: true
+        type: string
+      e2e_labels:
+        required: false
+        type: string
+      os:
+        required: true
+        type: string
+
+jobs:
+  e2e_against_commit:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Run e2e Test
+        continue-on-error: true
+        run: |
+          echo -e "\033[32mSystem info: \033[0m"
+          lsb_release -a
+          echo -e "\033[32miptables --version \033[0m"
+          iptables --version
+
+

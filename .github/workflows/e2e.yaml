@@ -1,0 +1,61 @@
+name: Auto PR CI
+
+permissions: write-all
+on:
+  workflow_call:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'sha, tag, branch'
+        required: true
+        default: main
+      e2e_labels:
+        description: 'e2e labels(if not set, ginkgo will run all test, multi labels separated by commas)'
+        required: false
+        type: string
+      ipfamily:
+        description: 'IP family for the e2e test'
+        required: true
+        type: choice
+        default: 'dual'
+        options:
+          - ipv4
+          - ipv6
+          - dual
+          - all
+
+jobs:
+  e2e_dual:
+    uses: ./.github/workflows/call-e2e.yaml
+    with:
+      ref: main
+      ipfamily: dual
+      e2e_labels: ${{ needs.prepare.outputs.e2e_labels }}
+      os: ubuntu-latest
+    secrets: inherit
+
+  e2e_dual-ubuntu-20-04:
+    uses: ./.github/workflows/call-e2e.yaml
+    with:
+      ref: main
+      ipfamily: dual
+      e2e_labels: ${{ needs.prepare.outputs.e2e_labels }}
+      os: ubuntu-20.04
+    secrets: inherit
+
+  e2e_dual-ubuntu-18-04:
+    uses: ./.github/workflows/call-e2e.yaml
+    with:
+      ref: main
+      ipfamily: dual
+      e2e_labels: ${{ needs.prepare.outputs.e2e_labels }}
+      os: ubuntu-18.04
+    secrets: inherit
